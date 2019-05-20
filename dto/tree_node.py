@@ -1,3 +1,6 @@
+from typing import List
+
+
 class TreeNode:
     def __init__(self, character=None, frequency=0, left_child=None, right_child=None, parent=None):
         self.character = character
@@ -13,17 +16,33 @@ class TreeNode:
             self.left_child.fill_code_table(table, key << 1)
             self.right_child.fill_code_table(table, key << 1 | 1)
 
-    def __lt__(self, other):
+    def tree_to_list(self, list: List['TreeNode'] = None) -> list:
+        if list is None:
+            list = []
+        list.append(self)
+        if self.left_child:
+            self.left_child.tree_to_list(list)
+        if self.right_child:
+            self.right_child.tree_to_list(list)
+        return list
+
+    def is_data_node(self) -> bool:
+        return self.character
+
+    def __lt__(self, other: 'TreeNode'):
         return self.frequency < other.frequency
 
-    def __le__(self, other):
+    def __le__(self, other: 'TreeNode'):
         return self.frequency <= other.frequency
 
-    def __eq__(self, other):
-        return self.frequency == other.frequency
+    def __eq__(self, other: 'TreeNode'):
+        return self.frequency == other.frequency and \
+               self.character == other.character and \
+               self.left_child == other.left_child and \
+               self.right_child == other.right_child
 
-    def __gt__(self, other):
+    def __gt__(self, other: 'TreeNode'):
         return self.frequency > other.frequency
 
-    def __ge__(self, other):
+    def __ge__(self, other: 'TreeNode'):
         return self.frequency >= other.frequency
