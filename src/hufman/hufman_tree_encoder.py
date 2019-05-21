@@ -3,11 +3,11 @@ from typing import List, BinaryIO
 from src.hufman.dto.tree_node import TreeNode
 
 
-def tree_to_io(root: TreeNode, io: BinaryIO) -> None:
+def write_tree_to_file(root: TreeNode, io: BinaryIO) -> None:
     io.write(tree_to_bytes(root))
 
 
-def tree_from_io(io: BinaryIO) -> TreeNode:
+def read_tree_from_file(io: BinaryIO) -> TreeNode:
     node_count = int.from_bytes(io.read(1), 'big')
     data_length = node_count * 2 + (node_count // 8 + (1 if node_count % 8 else 0))
     tree_data = io.read(data_length)
@@ -19,11 +19,12 @@ def tree_to_bytes(root: TreeNode) -> bytes:
     buffer = len(nodes)
     nums = []
     for node in nodes:
-        if node.is_data_node():
-            buffer = buffer << 1 | 1
+        buffer = buffer << 1
+        if node.character or node.character == 0:
+            buffer = buffer | 1
             buffer = buffer << 16 | node.character
+            print(bin(buffer))
         else:
-            buffer = buffer << 1
             buffer = buffer << 8
             if node.left_child:
                 buffer = buffer | nodes.index(node.left_child)
@@ -33,6 +34,7 @@ def tree_to_bytes(root: TreeNode) -> bytes:
 
     length = 8 + 17 * len(nodes)
     bytes_str = bin(buffer)[2:].zfill(length)
+    print(bytes_str)
     for index in range(0, length, 8):
         sss = bytes_str[index:index + 8]
         tmp = int(sss, 2)
@@ -45,12 +47,13 @@ def read_tree_from_bytes(nodes_count: int, data: bytes):
     nodes_data = []
     data_int = int.from_bytes(data, 'big')
     for i in range(0, 17 * nodes_count, 17):
-        node_bits = data_int & 0b1_1111_1111_1111_1111
+        node_bits = data_int & 0b_1_11111111_11111111
         data_int = data_int >> 17
-        right_child_bits = node_bits & 0b1111_1111
+        right_child_bits = node_bits & 0b_1111_1111
         node_bits = node_bits >> 8
-        left_child_bits = node_bits & 0b1111_1111
-        is_data = _bit = data_int & 0b1
+        left_child_bits = node_bits & 0b_1111_1111
+        node_bits = node_bits >> 8
+        is_data = _bit = node_bits & 0b_1
         nodes_data.insert(0, {
             'is_data': is_data > 0,
             'left_byte': int(left_child_bits),

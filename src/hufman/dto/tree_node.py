@@ -27,9 +27,6 @@ class TreeNode:
             self.right_child.tree_to_list(list)
         return list
 
-    def is_data_node(self) -> bool:
-        return self.character
-
     def __lt__(self, other: 'TreeNode'):
         return self.frequency < other.frequency
 

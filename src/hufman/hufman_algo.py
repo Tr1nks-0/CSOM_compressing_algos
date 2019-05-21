@@ -2,18 +2,21 @@ from heapq import *
 from collections import defaultdict
 
 from src.hufman.dto.tree_node import TreeNode
-from src.hufman.hufman_tree_encoder import tree_to_io
+from src.hufman.hufman_tree_encoder import write_tree_to_file, read_tree_from_file
 
 
-def decompress_from_file() -> bytearray:
-    pass
-
+def decompress_from_file(filename: str) -> bytearray:
+    compressed = 0
+    with open(filename, 'rb') as file:
+        code_tree = read_tree_from_file(file)
+        print(type(file.readline()))
+    return bytearray()
 
 def compress_to_file(data: bytes, filename: str) -> None:
     byte_nodes = create_byte_nodes(data)
     code_tree = create_code_tree(byte_nodes)
     with open(filename, 'wb') as file:
-        tree_to_io(code_tree, file)
+        write_tree_to_file(code_tree, file)
         file.write(compress(data, code_tree))
 
 
