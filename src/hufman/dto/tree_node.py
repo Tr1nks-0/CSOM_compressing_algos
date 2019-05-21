@@ -3,18 +3,19 @@ from typing import List
 
 class TreeNode:
     def __init__(self, character=None, frequency=0, left_child=None, right_child=None, parent=None):
-        self.character = character
+        self.character: int = character
         self.frequency = frequency
         self.left_child = left_child
         self.right_child = right_child
         self.parent = parent
 
-    def fill_code_table(self, table: dict, key: int = 0) -> None:
+    def fill_code_table(self, table: dict, key: int = 0) -> dict:
         if not self.left_child and not self.right_child:
             table[self.character] = key
         else:
             self.left_child.fill_code_table(table, key << 1)
             self.right_child.fill_code_table(table, key << 1 | 1)
+        return table
 
     def tree_to_list(self, list: List['TreeNode'] = None) -> list:
         if list is None:
