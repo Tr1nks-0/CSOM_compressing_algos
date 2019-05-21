@@ -1,9 +1,7 @@
 from heapq import *
-import operator
 from collections import defaultdict
-from typing import List
 
-from dto.tree_node import TreeNode
+from src.hufman.dto.tree_node import TreeNode
 
 
 def create_byte_nodes(data: bytes) -> defaultdict:

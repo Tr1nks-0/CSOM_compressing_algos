@@ -36,10 +36,14 @@ class TreeNode:
         return self.frequency <= other.frequency
 
     def __eq__(self, other: 'TreeNode'):
-        return self.frequency == other.frequency and \
-               self.character == other.character and \
-               self.left_child == other.left_child and \
-               self.right_child == other.right_child
+        if not other:
+            return False
+        if self.character:
+            return self.character == other.character if other.character else False
+        else:
+            return self.frequency == other.frequency and \
+                   self.left_child == other.left_child and \
+                   self.right_child == other.right_child
 
     def __gt__(self, other: 'TreeNode'):
         return self.frequency > other.frequency
