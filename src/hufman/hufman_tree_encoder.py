@@ -1,4 +1,6 @@
-from typing import List, BinaryIO
+from typing import List, BinaryIO, Tuple
+
+import math
 
 from src.hufman.dto.tree_node import TreeNode
 
@@ -23,7 +25,6 @@ def tree_to_bytes(root: TreeNode) -> bytes:
         if node.character or node.character == 0:
             buffer = buffer | 1
             buffer = buffer << 16 | node.character
-            print(bin(buffer))
         else:
             buffer = buffer << 8
             if node.left_child:
@@ -32,10 +33,10 @@ def tree_to_bytes(root: TreeNode) -> bytes:
             if node.right_child:
                 buffer = buffer | nodes.index(node.right_child)
 
-    length = 8 + 17 * len(nodes)
-    bytes_str = bin(buffer)[2:].zfill(length)
-    print(bytes_str)
-    for index in range(0, length, 8):
+    actual_length, needed_length = __calculate_lengths(len(nodes))
+    buffer = buffer << needed_length - actual_length
+    bytes_str = bin(buffer)[2:].zfill(needed_length)
+    for index in range(0, needed_length - 1, 8):
         sss = bytes_str[index:index + 8]
         tmp = int(sss, 2)
         nums.append(tmp)
@@ -44,15 +45,19 @@ def tree_to_bytes(root: TreeNode) -> bytes:
 
 
 def read_tree_from_bytes(nodes_count: int, data: bytes):
+    payload_length, bytes_length = __calculate_lengths(nodes_count)
+    data_int = int.from_bytes(data, 'big') >> bytes_length - payload_length
     nodes_data = []
-    data_int = int.from_bytes(data, 'big')
     for i in range(0, 17 * nodes_count, 17):
         node_bits = data_int & 0b_1_11111111_11111111
         data_int = data_int >> 17
+
         right_child_bits = node_bits & 0b_1111_1111
         node_bits = node_bits >> 8
+
         left_child_bits = node_bits & 0b_1111_1111
         node_bits = node_bits >> 8
+
         is_data = _bit = node_bits & 0b_1
         nodes_data.insert(0, {
             'is_data': is_data > 0,
@@ -73,3 +78,9 @@ def build_tree_from_data(nodes_data: List[dict], index=0) -> TreeNode:
         if node_data.get('right_byte') > 0:
             node.right_child = build_tree_from_data(nodes_data, node_data.get('right_byte'))
     return node
+
+
+def __calculate_lengths(node_count: int) -> Tuple[int, int]:
+    payload_length = 17 * node_count
+    bytes_length = math.ceil(payload_length / 8) * 8
+    return payload_length, bytes_length
