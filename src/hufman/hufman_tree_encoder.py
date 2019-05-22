@@ -44,7 +44,7 @@ def tree_to_bytes(root: TreeNode) -> bytes:
     return bytes(nums)
 
 
-def read_tree_from_bytes(nodes_count: int, data: bytes):
+def read_tree_from_bytes(nodes_count: int, data: bytes) -> TreeNode:
     payload_length, bytes_length = __calculate_lengths(nodes_count)
     data_int = int.from_bytes(data, 'big') >> bytes_length - payload_length
     nodes_data = []
