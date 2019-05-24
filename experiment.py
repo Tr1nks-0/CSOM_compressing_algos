@@ -25,8 +25,7 @@ def create_code_tree(byte_nodes: defaultdict) -> TreeNode:
 
 
 def eject_code_table(code_tree_root: TreeNode) -> dict:
-    table = {}
-    code_tree_root.fill_code_table(table)
+    table = code_tree_root.tree_to_code_table()
     return table
 
 

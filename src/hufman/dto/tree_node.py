@@ -1,3 +1,4 @@
+from string import ascii_uppercase
 from typing import List
 
 
@@ -9,12 +10,14 @@ class TreeNode:
         self.right_child = right_child
         self.parent = parent
 
-    def fill_code_table(self, table: dict, key: int = 0) -> dict:
+    def tree_to_code_table(self, table: dict = None, key: str = '') -> dict:
+        if table is None:
+            table = {}
         if not self.left_child and not self.right_child:
             table[self.character] = key
         else:
-            self.left_child.fill_code_table(table, key << 1)
-            self.right_child.fill_code_table(table, key << 1 | 1)
+            self.left_child.tree_to_code_table(table, key + '0')
+            self.right_child.tree_to_code_table(table, key + '1')
         return table
 
     def tree_to_list(self, list: List['TreeNode'] = None) -> list:
