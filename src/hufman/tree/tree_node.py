@@ -1,12 +1,12 @@
 class Node:
-    def __init__(self, character: bytes = None, frequency: int = 0,
+    def __init__(self, character: int = None, frequency: int = 0,
                  left_child: 'Node' = None, right_child: 'Node' = None) -> 'Node':
         if frequency > 0:
             self.frequency: int = frequency
         if character is not None:
             if left_child is not None or right_child is not None:
                 raise RuntimeError('Attempt to add data to connection node')
-            self.character: bytes = character
+            self.character: int = character
         else:
             if left_child is not None:
                 self.left_child: 'Node' = left_child
@@ -14,7 +14,7 @@ class Node:
                 self.right_child: 'Node' = right_child
 
     @classmethod
-    def data_node(cls, character: bytes, frequency: int = 0) -> 'Node':
+    def data_node(cls, character: int, frequency: int = 0) -> 'Node':
         return cls(character=character, frequency=frequency)
 
     @classmethod
@@ -22,7 +22,13 @@ class Node:
         return cls(left_child=left_child, right_child=right_child, frequency=frequency)
 
     def is_data(self) -> bool:
-        return self.character is not None
+        return hasattr(self, 'character') and self.character is not None
+
+    def has_left_child(self) -> bool:
+        return hasattr(self, 'left_child') and self.left_child is not None
+
+    def has_right_child(self) -> bool:
+        return hasattr(self, 'right_child') and self.right_child is not None
 
     def __eq__(self, other):
         if not isinstance(other, Node):
@@ -45,3 +51,10 @@ class Node:
 
     def __ge__(self, other: 'Node'):
         return self.frequency >= other.frequency
+
+    # def __repr__(self) -> str:
+    #     if self.is_data():
+    #         str = f'data : {self.character} |'
+    #     else:
+    #         str = f'connect : left -> {self.left_child.__class__} & right -> {self.left_child.__class__} |'
+    #     return f'{self.__class__} - | frq: {self.frequency} , {str} |'

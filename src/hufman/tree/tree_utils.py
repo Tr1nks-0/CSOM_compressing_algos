@@ -1,19 +1,13 @@
 import math
 from collections import defaultdict
 from heapq import heappop
-from typing import List, Dict
+from typing import List, Dict, BinaryIO, Tuple
 
 from hufman.tree.tree_node import Node
 
 
-def build_tree_from_file(filename: str) -> Node:
-    with open(filename, 'rb') as file:
-        data = file.read()
-    return build_tree_from_bytes(data)
-
-
 def build_tree_from_bytes(data: bytes) -> Node:
-    frequencies = defaultdict()
+    frequencies = defaultdict(int)
     for byte in data:
         frequencies[byte] += 1
 
@@ -36,22 +30,32 @@ def tree_to_codetable(node: Node, table: Dict[bytes, str] = None, value: str = '
     if node.is_data():
         table[node.character] = value
     else:
-        if node.left_child is not None:
+        if node.has_left_child():
             tree_to_codetable(node.left_child, table, value + '0')
-        if node.right_child is not None:
+        if node.has_right_child():
             tree_to_codetable(node.right_child, table, value + '1')
     return table
 
 
-def tree_to_list(node: Node, list: List['TreeNode'] = None) -> list:
+def tree_to_list(node: Node, list: List[Node] = None) -> list:
     if list is None:
         list = []
     list.append(node)
-    if node.left_child is not None:
+    if node.has_left_child():
         tree_to_list(node.left_child, list)
-    if node.right_child is not None:
+    if node.has_right_child():
         tree_to_list(node.right_child, list)
     return list
+
+
+def tree_to_file(tree: Node, filename: str) -> None:
+    with open(filename, 'wb') as file:
+        tree_to_io(tree, file)
+
+
+def tree_to_io(tree: Node, io: BinaryIO) -> None:
+    tree_bytes = tree_to_bytes(tree)
+    io.write(tree_bytes)
 
 
 def tree_to_bytes(node: Node) -> bytes:
@@ -60,7 +64,7 @@ def tree_to_bytes(node: Node) -> bytes:
     for node in nodes:
         buffer = 0
         if node.is_data():
-            buffer = 1 << 18 | int.from_bytes(node.character, 'big')
+            buffer = 1 << 18 | node.character
         else:
             if node.left_child:
                 buffer = buffer << 9 | nodes.index(node.left_child)
@@ -70,56 +74,53 @@ def tree_to_bytes(node: Node) -> bytes:
 
     bit_str = ''.join(node_strs)
     bit_count = len(bit_str)
-    reduced_to_bytes_bit_count = math.ceil(bit_count / 8) * 8
-    bit_str = bit_str + '0' * (reduced_to_bytes_bit_count - bit_count)
+    reduced_bit_count = __reduce_to_bytes_bit_count(bit_count)
+    bit_str = bit_str + '0' * (reduced_bit_count - bit_count)
     return bytes(int(bit_str[index:index + 8], 2) for index in range(0, len(bit_str), 8))
 
-    # def decompress_from_file(filename: str, tree_temp) -> bytearray:
-#     with open((filename + '.tree'), 'rb') as file:
-#         code_tree = read_tree_from_file(file)
-#         print(code_tree == tree_temp)
-#         code_tree=tree_temp
-#     with open(filename, 'rb') as file:
-#         # code_tree = read_tree_from_file(file)
-#         readed = file.read()
-#         data_int = int.from_bytes(readed, 'big')
-#         data_bits = bin(data_int)[2:]
-#
-#         data_bytes = bytearray()
-#         node = code_tree
-#         for index in range(len(data_bits)):
-#             bit = data_bits[index:index + 1]
-#
-#             if bit == '1':
-#                 node = node.right_child
-#             else:
-#                 node = node.left_child
-#             if node.character is not None:
-#                 data_bytes.append(node.character)
-#                 node = code_tree
-#     return data_bytes
+
+def tree_from_file(filename: str) -> Tuple[Node, int]:
+    with open(filename, 'rb') as file:
+        return tree_from_io(file)
 
 
-# def compress_to_file(data: bytes, filename: str):
-#     byte_nodes = create_byte_nodes(data)
-#     code_tree = create_code_tree(byte_nodes)
-#     with open((filename + '.tree'), 'wb') as file:
-#         write_tree_to_file(code_tree, file)
-#     with open(filename, 'wb') as file:
-#         # write_tree_to_file(code_tree, file)
-#         file.write(compress(data, code_tree))
-#     return code_tree
+def tree_from_io(io: BinaryIO) -> Tuple[Node, int]:
+    node_count = int.from_bytes(io.read(2), 'big')
+    data_length = math.ceil(node_count * 19 / 8)
+    tree_bytes = io.read(data_length)
+    return tree_from_bytes(node_count, tree_bytes), node_count
 
-# def compress(data: bytes, code_tree: TreeNode) -> bytearray:
-#     code_table = code_tree.tree_to_code_table()
-#     temp = 0
-#     for byte in data:
-#         byte = code_table.get(byte)
-#         temp = temp << len(byte) | int(byte, 2)
-#     compressed = bytearray()
-#     for index in range(0, len(bin(temp)[2:]), 8):
-#         byte = temp & 0b1111_1111
-#         compressed.insert(0, byte)
-#         temp = temp >> 8
-#     return compressed
-#
+
+def tree_from_bytes(node_count: int, data: bytes) -> Node:
+    bit_count = 19 * node_count
+    reduced_bit_count = __reduce_to_bytes_bit_count(bit_count)
+    bit_str = bin(int.from_bytes(data, 'big') >> (reduced_bit_count - bit_count))[2:].zfill(bit_count)
+    nodes_data = []
+    for i in range(node_count):
+        node_bits = bit_str[i * 19:i * 19 + 19]
+        is_data = node_bits[0] == '1'
+        left = 0 if is_data else int(node_bits[1:10], 2)
+        right = int(node_bits[10:], 2)
+        nodes_data.append({
+            'is_data': is_data,
+            'left': left,
+            'right': right
+        })
+    return _restore_tree(nodes_data)
+
+
+def _restore_tree(nodes_data: List[dict], index=0) -> Node:
+    node_data = nodes_data[index]
+    if node_data['is_data']:
+        node = Node.data_node(node_data['right'])
+    else:
+        node = Node.connection_node()
+        if node_data['left'] > 0:
+            node.left_child = _restore_tree(nodes_data, node_data['left'])
+        if node_data['right'] > 0:
+            node.right_child = _restore_tree(nodes_data, node_data['right'])
+    return node
+
+
+def __reduce_to_bytes_bit_count(bit_count: int) -> int:
+    return math.ceil(bit_count / 8) * 8
