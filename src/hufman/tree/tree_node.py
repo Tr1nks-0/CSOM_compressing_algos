@@ -1,23 +1,24 @@
 class Node:
-    def __init__(self, character=None, frequency=0, left_child=None, right_child=None) -> 'Node':
+    def __init__(self, character: bytes = None, frequency: int = 0,
+                 left_child: 'Node' = None, right_child: 'Node' = None) -> 'Node':
         if frequency > 0:
-            self.frequency = frequency
+            self.frequency: int = frequency
         if character is not None:
             if left_child is not None or right_child is not None:
                 raise RuntimeError('Attempt to add data to connection node')
-            self.character = character
+            self.character: bytes = character
         else:
             if left_child is not None:
-                self.left_child = left_child
+                self.left_child: 'Node' = left_child
             if right_child is not None:
-                self.right_child = right_child
+                self.right_child: 'Node' = right_child
 
     @classmethod
-    def data_node(cls, character, frequency=0) -> 'Node':
+    def data_node(cls, character: bytes, frequency: int = 0) -> 'Node':
         return cls(character=character, frequency=frequency)
 
     @classmethod
-    def connection_node(cls, left_child=None, right_child=None, frequency=0) -> 'Node':
+    def connection_node(cls, left_child: 'Node' = None, right_child: 'Node' = None, frequency: int = 0) -> 'Node':
         return cls(left_child=left_child, right_child=right_child, frequency=frequency)
 
     def is_data(self) -> bool:
