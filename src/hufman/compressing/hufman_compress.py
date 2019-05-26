@@ -22,38 +22,14 @@ def compress_to_io(data: bytes, io: BinaryIO) -> None:
 def compress_to_bytes(data: bytes) -> bytes:
     hufman_tree = build_tree_from_bytes(data)
     code_table = tree_to_codetable(hufman_tree)
-    temp = 0
-    leading_zero_count = 0
-    first_1_reached = False
+    bit_str = ''
     for byte in data:
         encoded = code_table.get(byte)
-
-        if not first_1_reached:
-            if '1' in encoded:
-                first_1_reached = True
-                leading_zero_count += encoded.index('1')
-            else:
-                leading_zero_count += len(encoded)
-
-        temp = temp << len(encoded) | int(encoded, 2)
-    bit_str = '0' * leading_zero_count + bin(temp)[2:]
+        bit_str = bit_str + encoded
     bit_count = len(bit_str)
     reduced_bit_count = math.ceil(bit_count / 8) * 8
     bit_str = bit_str + '0' * (reduced_bit_count - bit_count)
-    print(bit_str)
-    # debug(hufman_tree, code_table, data)
     return tree_to_bytes(hufman_tree) + bytes(int(bit_str[index:index + 8], 2) for index in range(0, len(bit_str), 8))
-
-
-def debug(tree, codetable, data):
-    # r l r l l r l r    175
-    a = tree.right_child.left_child.right_child.left_child.left_child.right_child.left_child.right_child.character
-    print(a)
-    b = data[0]
-    print(b)
-    c = codetable.get(b)
-    print(c)
-    print()
 
 
 def restore_from_io(io: BinaryIO) -> bytes:
