@@ -5,11 +5,17 @@ from src.hufman.dto.tree_node import TreeNode
 from src.hufman.hufman_tree_encoder import write_tree_to_file, read_tree_from_file
 
 
-def decompress_from_file(filename: str) -> bytearray:
-    with open(filename, 'rb') as file:
+def decompress_from_file(filename: str, tree_temp) -> bytearray:
+    with open((filename + '.tree'), 'rb') as file:
         code_tree = read_tree_from_file(file)
-        data_int = int.from_bytes(file.read(), 'big')
+        print(code_tree == tree_temp)
+        code_tree=tree_temp
+    with open(filename, 'rb') as file:
+        # code_tree = read_tree_from_file(file)
+        readed = file.read()
+        data_int = int.from_bytes(readed, 'big')
         data_bits = bin(data_int)[2:]
+
         data_bytes = bytearray()
         node = code_tree
         for index in range(len(data_bits)):
@@ -25,12 +31,15 @@ def decompress_from_file(filename: str) -> bytearray:
     return data_bytes
 
 
-def compress_to_file(data: bytes, filename: str) -> None:
+def compress_to_file(data: bytes, filename: str):
     byte_nodes = create_byte_nodes(data)
     code_tree = create_code_tree(byte_nodes)
-    with open(filename, 'wb') as file:
+    with open((filename + '.tree'), 'wb') as file:
         write_tree_to_file(code_tree, file)
+    with open(filename, 'wb') as file:
+        # write_tree_to_file(code_tree, file)
         file.write(compress(data, code_tree))
+    return code_tree
 
 
 def compress(data: bytes, code_tree: TreeNode) -> bytearray:
