@@ -11,6 +11,16 @@ def restore(filename):
     pass
 
 
+def operate(in_file_str, mode):
+    filenames = in_file_str.split(',')
+    for filename in filenames:
+        if 'c' in mode:
+            meta = compress_file(filename)
+            print(f'File size reduced on {meta[0]} bytes. Compress rate: {meta[1]:.2f}%')
+        if 'r' in mode:
+            restore_file(filename)
+
+
 if __name__ == '__main__':
     loop = True
     while (loop):
@@ -27,10 +37,4 @@ if __name__ == '__main__':
             mode = sys.argv[1]
             in_file_str = sys.argv[2]
 
-        filenames = in_file_str.split(',')
-        for filename in filenames:
-            if 'c' in mode:
-                meta = compress_file(filename)
-                print(f'File size reduced on {meta[0]} bytes. Compress rate: {meta[1]:.2f}%')
-            if 'r' in mode:
-                restore_file(filename)
+        operate(in_file_str, mode)
