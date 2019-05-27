@@ -36,9 +36,7 @@ class Node:
         if self.is_data():
             return other.is_data() and self.character == other.character
         else:
-            return not other.is_data() and \
-                   self.left_child == other.left_child and \
-                   self.right_child == other.right_child
+            return not other.is_data() and self.left_child == other.left_child and self.right_child == other.right_child
 
     def __lt__(self, other: 'Node'):
         return self.frequency < other.frequency
@@ -51,10 +49,3 @@ class Node:
 
     def __ge__(self, other: 'Node'):
         return self.frequency >= other.frequency
-
-    # def __repr__(self) -> str:
-    #     if self.is_data():
-    #         str = f'data : {self.character} |'
-    #     else:
-    #         str = f'connect : left -> {self.left_child.__class__} & right -> {self.left_child.__class__} |'
-    #     return f'{self.__class__} - | frq: {self.frequency} , {str} |'
