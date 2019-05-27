@@ -1,6 +1,8 @@
 import sys
 from pathlib import Path
 
+from hufman.compressing.hufman_compress import compress_file, restore_file
+
 
 def help():
     print("""This is a util for compress files with Hufman algo.
