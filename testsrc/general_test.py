@@ -23,7 +23,7 @@ class GeneralTest(TestCase):
     def test_1(self):
         # base = 'D:/WORKSPACE/python/ControlSystemOptimizationMethods/resources'
         # filename = 'wn.png'
-        base = "D:/WORKSPACE/python/ControlSystemOptimizationMethods/resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/EXE-файлы/DOS'овская программа Chemical Analysis"
+        base = "D:/WORKSPACE/python/ControlSystemOptimizationMethods/resources/files/EXE-файлы/DOS'овская программа Chemical Analysis"
         filename = '101.EXE'
         in_filename = os.path.join(base, filename)
         compr_filename = in_filename + '.hfm'
@@ -39,7 +39,7 @@ class GeneralTest(TestCase):
             out_file.write(rest_data)
 
     def test_all_passed_files_compress_restore_compare(self):
-        for initial_filename in walk_files('D:/WORKSPACE/python/ControlSystemOptimizationMethods/resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!'):
+        for initial_filename in walk_files('D:/WORKSPACE/python/ControlSystemOptimizationMethods/resources/files'):
             print(initial_filename)
             meta = compress_file(initial_filename)
             print(f'File size reduced on {meta[0]} bytes. Compress rate: {meta[1]:.2f}%')
