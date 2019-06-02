@@ -9,13 +9,15 @@ from hufman.tree.tree_utils import build_tree_from_bytes, tree_to_codetable, tre
 def compress_file(filename: str) -> tuple:
     with open(filename, 'rb') as input_file:
         data = input_file.read()
-        return compress_to_file(data, filename + '.hfm')
+        return compress_to_file(data, str(filename) + '.hfm')
 
 
-def restore_file(filename: str) -> None:
+def restore_file(filename: str) -> str:
     restored = restore_from_file(filename)
-    with open(__resolve_restored_filename(filename), 'wb') as file:
+    restored_filename = __resolve_restored_filename(filename)
+    with open(restored_filename, 'wb') as file:
         file.write(restored)
+    return restored_filename
 
 
 def compress_to_file(data: bytes, filename: str) -> tuple:
@@ -64,7 +66,7 @@ def restore_from_bytes(hufman_tree: Node, data: bytes) -> bytes:
     for bit_str in data_bits:
         if bit_str == '1':
             node = node.right_child
-        else:
+        elif hasattr(node, 'left_child'):
             node = node.left_child
         if node.is_data():
             restored_data.append(node.character)

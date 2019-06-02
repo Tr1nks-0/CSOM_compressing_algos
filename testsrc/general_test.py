@@ -1,7 +1,21 @@
 import os
+from pathlib import Path
+from typing import Union
 from unittest import TestCase
 
-from hufman.compressing.hufman_compress import compress_to_file, restore_from_file
+from hufman.compressing.hufman_compress import compress_to_file, restore_from_file, compress_file, restore_file
+
+
+def walk_files(path: Union[Path, str]):
+    if not isinstance(path, Path):
+        path = Path(path)
+
+    if path.is_dir():
+        for nested in path.iterdir():
+            for iteration in walk_files(nested):
+                yield iteration
+    elif path.is_file():
+        yield path
 
 
 class GeneralTest(TestCase):
@@ -25,32 +39,26 @@ class GeneralTest(TestCase):
             out_file.write(rest_data)
 
     def test_all_passed_files_compress_restore_compare(self):
-        filenames = [
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/EXE-файлы/DOS'овская программа Chemical Analysis/101.EXE",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/EXE-файлы/Linux 2.x e-mail программа PINE/pine.bin",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/EXE-файлы/Netscape Navigator v4.06 под Windows 95-98/netscape.exe",
+        for initial_filename in walk_files('D:/WORKSPACE/python/ControlSystemOptimizationMethods/resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!'):
+            print(initial_filename)
+            meta = compress_file(initial_filename)
+            print(f'File size reduced on {meta[0]} bytes. Compress rate: {meta[1]:.2f}%')
 
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/TXT-файлы/Anne of Green Gables by Lucy Maud Montgomery/anne11.txt",
-            "D:\WORKSPACE\python\ControlSystemOptimizationMethods\resources\!!! ТЕСТОВЫЕ ФАЙЛЫ !!!\TXT-файлы\Английский перевод книги Три Мушкетера Александра Дюма\1musk10.txt",
-            "D:\WORKSPACE\python\ControlSystemOptimizationMethods\resources\!!! ТЕСТОВЫЕ ФАЙЛЫ !!!\TXT-файлы\Книга Мировых Фактов ЦРУ 1995\world95.txt",
+            compressed_filename = str(initial_filename) + '.hfm'
+            restored_filename = restore_file(compressed_filename)
 
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/WORMS2 Test Files/_INST32I.EX_",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/WORMS2 Test Files/_ISDEL.EXE",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/WORMS2 Test Files/_SETUP.DLL",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/WORMS2 Test Files/_sys1.cab",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/WORMS2 Test Files/_user1.cab",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/WORMS2 Test Files/codec.exe",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/WORMS2 Test Files/DATA.TAG",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/WORMS2 Test Files/data1.cab",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/WORMS2 Test Files/lang.dat",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/WORMS2 Test Files/layout.bin",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/WORMS2 Test Files/os.dat",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/WORMS2 Test Files/setup.bmp",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/WORMS2 Test Files/SETUP.EXE",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/WORMS2 Test Files/SETUP.INI",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/WORMS2 Test Files/setup.ins",
-            "resources/!!! ТЕСТОВЫЕ ФАЙЛЫ !!!/WORMS2 Test Files/setup.lid",
+            with open(initial_filename, 'rb') as initial, open(restored_filename, 'rb') as restored:
+                initial_data = initial.read()
+                restored_data = restored.read()
+            equal = initial_data == restored_data
+            if equal:
+                print('SUCCESS: Initial and compressed&restored file content are identical')
+                Path(compressed_filename).unlink()
+                Path(restored_filename).unlink()
+            else:
+                print('FAILTURE')
+                print('init:', initial_data)
+                print('rest:', restored_data)
+            # self.assertTrue(equal)
+            print('\n------------------------------------------------\n\n')
 
-            "",
-            "",
-        ]

@@ -36,5 +36,8 @@ if __name__ == '__main__':
             loop = False
             mode = sys.argv[1]
             in_file_str = sys.argv[2]
-
-        operate(in_file_str, mode)
+        try:
+            operate(in_file_str, mode)
+        except FileNotFoundError:
+            print(f'Can not find file : {in_file_str}')
+            exit(1)
