@@ -1,7 +1,10 @@
+import json
+
 import math
 import os
 from typing import BinaryIO, Tuple
 
+from hufman.tree.tree_json_encoder import TreeEncoder
 from hufman.tree.tree_node import Node
 from hufman.tree.tree_utils import build_tree_from_bytes, tree_to_codetable, tree_to_bytes, tree_from_io
 
@@ -45,13 +48,14 @@ def restore_from_io(io: BinaryIO) -> bytes:
 def compress_to_bytes(data: bytes) -> Tuple[bytes, tuple]:
     hufman_tree = build_tree_from_bytes(data)
     code_table = tree_to_codetable(hufman_tree)
-    bit_str = ''
+    bit_str = '000'
     for byte in data:
         encoded = code_table.get(byte)
         bit_str = bit_str + encoded
     bit_count = len(bit_str)
     reduced_bit_count = math.ceil(bit_count / 8) * 8
-    bit_str = bit_str + '0' * (reduced_bit_count - bit_count)
+    byte_complete_offset = reduced_bit_count - bit_count
+    bit_str = bin(byte_complete_offset)[2:] + bit_str[3:] + '0' * byte_complete_offset
     compressed = tree_to_bytes(hufman_tree) + bytes(
         int(bit_str[index:index + 8], 2) for index in range(0, len(bit_str), 8))
     return compressed, calculate_meta(len(data), len(compressed))
@@ -61,12 +65,14 @@ def restore_from_bytes(hufman_tree: Node, data: bytes) -> bytes:
     reduced_bit_count = len(data) * 8
     data_int = int.from_bytes(data, 'big')
     data_bits = bin(data_int)[2:].zfill(reduced_bit_count)
+    byte_complete_offset = int(data_bits[:3], 2)
+    data_bits = data_bits[3:-byte_complete_offset]
     restored_data = bytearray()
     node = hufman_tree
     for bit_str in data_bits:
         if bit_str == '1':
             node = node.right_child
-        elif hasattr(node, 'left_child'):
+        else:
             node = node.left_child
         if node.is_data():
             restored_data.append(node.character)
