@@ -57,8 +57,6 @@ class GeneralTest(TestCase):
                 Path(restored_filename).unlink()
             else:
                 print('FAILTURE')
-                print('init:', initial_data)
-                print('rest:', restored_data)
-            # self.assertTrue(equal)
+            self.assertTrue(equal)
             print('\n------------------------------------------------\n\n')
 
