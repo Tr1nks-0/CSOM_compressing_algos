@@ -3,7 +3,7 @@ from collections import defaultdict
 from heapq import heappop
 from typing import List, Dict, BinaryIO, Tuple
 
-from hufman.tree.tree_node import Node
+from encoder.hufman.tree.tree_node import Node
 
 
 def build_tree_from_bytes(data: bytes) -> Node:

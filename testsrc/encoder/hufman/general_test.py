@@ -1,9 +1,8 @@
-import os
 from pathlib import Path
 from typing import Union
 from unittest import TestCase
 
-from hufman.compressing.hufman_compress import compress_to_file, restore_from_file, compress_file, restore_file
+from encoder.hufman.hufman_compress import compress_file, restore_file
 
 
 def walk_files(path: Union[Path, str]):
@@ -21,7 +20,8 @@ def walk_files(path: Union[Path, str]):
 class GeneralTest(TestCase):
 
     def test_all_passed_files_compress_restore_compare(self):
-        for initial_filename in walk_files('D:/WORKSPACE/python/ControlSystemOptimizationMethods/resources/files'):
+        files_dir = Path(__file__).parents[3] / 'resources' / 'files'
+        for initial_filename in walk_files(files_dir):
             print(initial_filename)
             meta = compress_file(initial_filename)
             print(f'File size reduced on {meta[0]} bytes. Compress rate: {meta[1]:.2f}%')
@@ -41,4 +41,3 @@ class GeneralTest(TestCase):
                 print('FAILTURE')
             self.assertTrue(equal)
             print('\n------------------------------------------------\n\n')
-

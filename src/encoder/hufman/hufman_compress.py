@@ -1,12 +1,9 @@
-import json
-
 import math
 import os
 from typing import BinaryIO, Tuple
 
-from hufman.tree.tree_json_encoder import TreeEncoder
-from hufman.tree.tree_node import Node
-from hufman.tree.tree_utils import build_tree_from_bytes, tree_to_codetable, tree_to_bytes, tree_from_io
+from encoder.hufman.tree.tree_node import Node
+from encoder.hufman.tree.tree_utils import build_tree_from_bytes, tree_to_codetable, tree_to_bytes, tree_from_io
 
 
 def compress_file(filename: str) -> tuple:

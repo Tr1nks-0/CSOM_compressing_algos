@@ -1,6 +1,6 @@
 import sys
 
-from hufman.compressing.hufman_compress import compress_file, restore_file
+from encoder.hufman.hufman_compress import compress_file, restore_file
 
 
 def compress(filename):

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from hufman.tree.tree_node import Node
+from encoder.hufman.tree.tree_node import Node
 
 
 class TreeNodeTests(TestCase):

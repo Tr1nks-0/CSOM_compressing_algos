@@ -1,7 +1,7 @@
 import json
 from json import JSONEncoder
 
-from hufman.tree.tree_node import Node
+from encoder.hufman.tree.tree_node import Node
 
 
 class TreeEncoder(JSONEncoder):
