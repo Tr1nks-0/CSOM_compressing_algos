@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/controlsSystemOptimisationMethods.iml" filepath="$PROJECT_DIR$/.idea/controlsSystemOptimisationMethods.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/ControlSystemOptimizationMethods.iml" filepath="$PROJECT_DIR$/.idea/ControlSystemOptimizationMethods.iml" />
     </modules>
   </component>
 </project>

@@ -28,7 +28,7 @@ def tree_to_codetable(node: Node, table: Dict[bytes, str] = None, value: str = '
     if table is None:
         table = {}
     if node.is_data():
-        table[node.character] = value
+        table[node.character] = value if value else '0'
     else:
         if node.has_left_child():
             tree_to_codetable(node.left_child, table, value + '0')
@@ -86,6 +86,8 @@ def tree_from_file(filename: str) -> Tuple[Node, int]:
 
 def tree_from_io(io: BinaryIO) -> Tuple[Node, int]:
     node_count = int.from_bytes(io.read(2), 'big')
+    if node_count == 0:
+        return None, 0
     data_length = math.ceil(node_count * 19 / 8)
     tree_bytes = io.read(data_length)
     return tree_from_bytes(node_count, tree_bytes), node_count

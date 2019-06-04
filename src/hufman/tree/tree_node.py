@@ -7,10 +7,12 @@ class Node:
             if left_child is not None or right_child is not None:
                 raise RuntimeError('Attempt to add data to connection node')
             self.character: int = character
+            self.left_child=None
+            self.right_child=None
         else:
-            if left_child is not None:
+            # if left_child is not None:
                 self.left_child: 'Node' = left_child
-            if right_child is not None:
+            # if right_child is not None:
                 self.right_child: 'Node' = right_child
 
     @classmethod
