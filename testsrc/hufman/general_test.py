@@ -20,24 +20,6 @@ def walk_files(path: Union[Path, str]):
 
 class GeneralTest(TestCase):
 
-    def test_1(self):
-        # base = 'D:/WORKSPACE/python/ControlSystemOptimizationMethods/resources'
-        # filename = 'wn.png'
-        base = "D:/WORKSPACE/python/ControlSystemOptimizationMethods/resources/files/EXE-файлы/DOS'овская программа Chemical Analysis"
-        filename = '101.EXE'
-        in_filename = os.path.join(base, filename)
-        compr_filename = in_filename + '.hfm'
-        out_filename = os.path.join(base, 'restored_' + filename)
-
-        with open(in_filename, 'rb') as in_file:
-            in_data = in_file.read()
-
-        compress_to_file(in_data, compr_filename)
-
-        rest_data = restore_from_file(compr_filename)
-        with open(out_filename, 'wb') as out_file:
-            out_file.write(rest_data)
-
     def test_all_passed_files_compress_restore_compare(self):
         for initial_filename in walk_files('D:/WORKSPACE/python/ControlSystemOptimizationMethods/resources/files'):
             print(initial_filename)
