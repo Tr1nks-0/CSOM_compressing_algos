@@ -30,6 +30,9 @@ def _create_probabilities(data: bytes) -> dict:
 
 
 def _create_ranges(probabilities: dict) -> Dict[bytes, Range]:
+    """
+    create ranges from probabilities. Total summ of probabilities should be equal 1
+    """
     left_gap: Decimal = Decimal(0)
     ranges = {}
 
@@ -41,7 +44,7 @@ def _create_ranges(probabilities: dict) -> Dict[bytes, Range]:
     return ranges
 
 
-def encode(data):
+def encode(data: bytes) -> Decimal:
     probabilities = _create_probabilities(data)
     ranges = _create_ranges(probabilities)
     cr = Range(0, 1)
@@ -50,6 +53,17 @@ def encode(data):
         cr.y = delta * ranges[byte].y + cr.x  # y fist b'cose x use in y counting
         cr.x = delta * ranges[byte].x + cr.x
     return cr.x
+
+
+def get_range_by_decimal(ranges: Dict[bytes, Range], data: Decimal):
+
+    pass
+
+
+def decode(data: Decimal, ranges: Dict[bytes, Range]) -> bytes:
+    restored = bytearray()
+
+    return bytes(restored)
 
 
 if __name__ == '__main__':
