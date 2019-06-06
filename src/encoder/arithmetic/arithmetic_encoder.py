@@ -1,16 +1,8 @@
+from collections import defaultdict
 from decimal import Decimal
-from typing import Dict, Tuple, Union
+from typing import Dict
 
-
-class Range:
-    def __init__(self, x: Union[Decimal, int, float] = Decimal(0), y: Union[Decimal, int, float] = Decimal(0)):
-        self.x = x if isinstance(x, Decimal) else Decimal(x)
-        self.y = y if isinstance(y, Decimal) else Decimal(y)
-
-    def is_in_range(self, a: Union[Decimal, int, float]):
-        if not isinstance(a, Decimal):
-            a = Decimal(a)
-        return self.x <= a < self.y
+from encoder.arithmetic.range import Range
 
 
 def _create_probabilities(data: bytes) -> dict:
@@ -31,7 +23,7 @@ def _create_probabilities(data: bytes) -> dict:
     return probabilities
 
 
-def _create_ranges(probabilities: dict) -> Dict[bytes, Range]:
+def _create_ranges(probabilities: dict) -> Dict[int, Range]:
     """
     create ranges from probabilities. Total summ of probabilities should be equal 1
     """
@@ -46,27 +38,42 @@ def _create_ranges(probabilities: dict) -> Dict[bytes, Range]:
     return ranges
 
 
+def _create_initial_ranges() -> Dict[int, Range]:
+    ranges = {}
+    probability = Decimal(1) / Decimal(257)
+    left_gap: Decimal = Decimal(0)
+    right_gap: Decimal = Decimal(0)
+    for byte in range(0, 256):
+        right_gap = left_gap + probability
+        ranges[byte] = Range(left_gap, right_gap)
+        left_gap = right_gap
+    ranges[257] = Range(left_gap, right_gap, EOF=True)
+    return ranges
+
+
 def encode(data: bytes) -> Decimal:
-    probabilities = _create_probabilities(data)
-    ranges = _create_ranges(probabilities)
+    ranges = _create_initial_ranges()
+    frequencies = defaultdict(int)
     cr = Range(0, 1)
     for byte in data:
+        frequencies[byte] += 1
         delta = cr.y - cr.x
         cr.y = delta * ranges[byte].y + cr.x  # y fist b'cose x use in y counting
         cr.x = delta * ranges[byte].x + cr.x
+
     return cr.x, ranges
 
 
-def get_range_by_decimal(ranges: Dict[bytes, Range], num: Decimal):
+def get_range_by_decimal(ranges: Dict[int, Range], num: Decimal):
     for byte, range in ranges.items():
         if range.is_in_range(num):
-            return (byte, range)
+            return byte, range
     raise RuntimeError('Passed number is out of range of all ranges')
 
 
-def decode(data: Decimal, length: int, ranges: Dict[bytes, Range]) -> bytes:
+def decode(data: Decimal, length: int) -> bytes:
     restored = bytearray()
-
+    ranges = _create_initial_ranges()
     for i in range(length):
         byte, range_n = get_range_by_decimal(ranges, data)
         restored.append(byte)
