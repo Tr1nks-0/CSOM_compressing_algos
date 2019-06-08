@@ -1,54 +1,31 @@
 from collections import defaultdict
 from decimal import Decimal
-from typing import Dict
+from typing import Dict, Tuple, Union
 
 from encoder.arithmetic.range import Range
 
-
-# def _create_probabilities(data: bytes) -> dict:
-#     """
-#     obtain P(n) for all 256 bytes
-#
-#     [ b'\x00' ; b'\xff' ]
-#     """
-#     frequencies = dict.fromkeys(range(0, 256), Decimal(0))  # alphabet power (supply)  = 256
-#     for byte in data:
-#         frequencies[byte] += 1  # count of each symbol
-#
-#     length = Decimal(len(data))  # total symbols count
-#     probabilities = dict(sorted(frequencies.items(), key=lambda kv: (kv[1], kv[0]), reverse=True))  # sort by desc freq
-#     for byte, count in probabilities.items():
-#         probabilities[byte] = Decimal(count) / Decimal(length)  # probability of each symbol
-#
-#     return probabilities
-#
-#
-# def _create_ranges(probabilities: dict) -> Dict[int, Range]:
-#     """
-#     create ranges from probabilities. Total summ of probabilities should be equal 1
-#     """
-#     left_gap: Decimal = Decimal(0)
-#     ranges = {}
-#
-#     for byte, probability in probabilities.items():
-#         right_gap = left_gap + probability
-#         ranges[byte] = Range(left_gap, right_gap)
-#         left_gap = right_gap
-#
-#     return ranges
+EOF_KEY = 256
 
 
-def _create_initial_ranges() -> (Dict[int, Range], Range):
-    ranges = {}
-    probability = Decimal(1) / Decimal(257)
+def _create_ranges(frequencies: Dict[int, int], count: Union[int, Decimal]) -> (Dict[int, Range], Range):
     left_gap: Decimal = Decimal(0)
-    for byte in range(0, 256):
-        right_gap: Decimal = left_gap + probability
-        ranges[byte] = Range(left_gap, right_gap)
+    ranges = {}
+    if not isinstance(count, Decimal):
+        count = Decimal(count)
+    for byte, frequency in frequencies.items():
+        probability = frequency / count
+        right_gap = left_gap + probability
+        ranges[byte] = Range(left_gap, right_gap, byte == EOF_KEY)
         left_gap = right_gap
-    right_gap = left_gap + probability
-    ranges[257] = Range(left_gap, right_gap, EOF=True)
-    return ranges, ranges[257]
+
+    return ranges, ranges[EOF_KEY]
+
+
+def _create_initial_ranges() -> Tuple[Dict[int, int], Dict[int, Range], Range]:
+    frequencies = dict.fromkeys(range(256), Decimal(1))
+    frequencies[EOF_KEY] = Decimal(1)
+    ranges, eof = _create_ranges(frequencies, 257)
+    return frequencies, ranges, eof
 
 
 def get_range_by_decimal(ranges: Dict[int, Range], num: Decimal):
@@ -59,8 +36,7 @@ def get_range_by_decimal(ranges: Dict[int, Range], num: Decimal):
 
 
 def encode(data: bytes) -> Decimal:
-    ranges, eof = _create_initial_ranges()
-    frequencies = defaultdict(int)
+    frequencies, ranges, eof = _create_initial_ranges()
     cr = Range(0, 1)
     for byte in data:
         frequencies[byte] += 1
@@ -69,15 +45,14 @@ def encode(data: bytes) -> Decimal:
         cr.x = delta * ranges[byte].x + cr.x
 
     delta = cr.y - cr.x
-    # cr.y = delta * eof.y + cr.x  # y fist b'cose x use in y counting
     cr.x = delta * eof.x + cr.x
 
     return cr.x
 
 
-def decode(data: Decimal, length: int) -> bytes:
+def decode(data: Decimal) -> bytes:
     restored = bytearray()
-    ranges, _ = _create_initial_ranges()
+    frequencies, ranges, _ = _create_initial_ranges()
     not_end = True
     while not_end:
         byte, range_n = get_range_by_decimal(ranges, data)
@@ -91,7 +66,6 @@ def decode(data: Decimal, length: int) -> bytes:
 
 
 if __name__ == '__main__':
-    # a = 0.79052344320
     data = bytes([0, 1, 2, 1, 2, 2, 0, 1, 2, 3])
     coded = encode(data)
     print(coded)
