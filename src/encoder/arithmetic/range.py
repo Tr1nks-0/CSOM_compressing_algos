@@ -1,17 +1,20 @@
-from decimal import Decimal
+from fractions import Fraction
 from typing import Union
 
 
 class Range:
     def __init__(self,
-                 x: Union[Decimal, int, float] = Decimal(0),
-                 y: Union[Decimal, int, float] = Decimal(0),
+                 x: Union[Fraction, int, float] = Fraction(0),
+                 y: Union[Fraction, int, float] = Fraction(0),
                  EOF=False):
         self.EOF = EOF
-        self.x = x if isinstance(x, Decimal) else Decimal(x)
-        self.y = y if isinstance(y, Decimal) else Decimal(y)
+        self.x = x if isinstance(x, Fraction) else Fraction(x)
+        self.y = y if isinstance(y, Fraction) else Fraction(y)
 
-    def is_in_range(self, a: Union[Decimal, int, float]):
-        if not isinstance(a, Decimal):
-            a = Decimal(a)
+    def is_in_range(self, a: Union[Fraction, int, float]):
+        if not isinstance(a, Fraction):
+            a = Fraction(a)
         return self.x <= a < self.y
+
+    def __repr__(self):
+        return f'[{self.x} --- {self.y}]'
