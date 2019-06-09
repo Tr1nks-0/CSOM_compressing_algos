@@ -6,6 +6,10 @@ from typing import List, Dict, BinaryIO, Tuple
 from encoder.hufman.tree.tree_node import Node
 
 
+# NAME: Sergey Baydin, 8.04.122.010.18.2
+# ASGN: N1
+
+
 def build_tree_from_bytes(data: bytes) -> Node:
     frequencies = defaultdict(int)
     for byte in data:

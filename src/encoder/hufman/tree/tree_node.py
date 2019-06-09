@@ -1,4 +1,7 @@
 class Node:
+    # NAME: Sergey Baydin, 8.04.122.010.18.2
+    # ASGN: N1
+
     def __init__(self, character: int = None, frequency: int = 0,
                  left_child: 'Node' = None, right_child: 'Node' = None) -> 'Node':
         if frequency > 0:
@@ -7,13 +10,13 @@ class Node:
             if left_child is not None or right_child is not None:
                 raise RuntimeError('Attempt to add data to connection node')
             self.character: int = character
-            self.left_child=None
-            self.right_child=None
+            self.left_child = None
+            self.right_child = None
         else:
             # if left_child is not None:
-                self.left_child: 'Node' = left_child
+            self.left_child: 'Node' = left_child
             # if right_child is not None:
-                self.right_child: 'Node' = right_child
+            self.right_child: 'Node' = right_child
 
     @classmethod
     def data_node(cls, character: int, frequency: int = 0) -> 'Node':

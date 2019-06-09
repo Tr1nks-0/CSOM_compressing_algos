@@ -5,6 +5,9 @@ from encoder.hufman.tree.tree_node import Node
 
 
 class TreeEncoder(JSONEncoder):
+    # NAME: Sergey Baydin, 8.04.122.010.18.2
+    # ASGN: N1
+
     def default(self, obj):
         if isinstance(obj, Node):
             if obj.is_data():

@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Union
 from unittest import TestCase
 
-from encoder.hufman.hufman_encoder import HufmanEncoder
+from encoder.arithmetic.arithmetic_encoder import ArithmeticEncoder
 
 
 def walk_files(path: Union[Path, str]):
@@ -20,7 +20,7 @@ def walk_files(path: Union[Path, str]):
 class GeneralTest(TestCase):
 
     def test_all_passed_files_compress_restore_compare(self):
-        encoder = HufmanEncoder()
+        encoder = ArithmeticEncoder()
         files_dir = Path(__file__).parents[3] / 'resources' / 'files'
         for initial_filename in walk_files(files_dir):
             print(initial_filename)
