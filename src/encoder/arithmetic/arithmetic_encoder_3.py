@@ -1,6 +1,9 @@
-ALPHABET_SIZE = 258  # use 258 because it more dividable
-EOF = 256
-OPERATORS_SIZE = 8
+# ALPHABET_SIZE = 258  # use 258 because it more dividable
+ALPHABET_SIZE = 6  # use 258 because it more dividable
+# EOF = 256
+EOF = 5
+# OPERATORS_SIZE = 8
+OPERATORS_SIZE = 4
 
 
 class Range:
@@ -26,14 +29,21 @@ def create_initial_ranges() -> list:
 
 
 def initialize():
-    ranges = create_initial_ranges()
+    # ranges = create_initial_ranges()
+    ranges = [
+        Range(0.5, 1),  # S
+        Range(0.4, 0.5),  # W
+        Range(0.2, 0.4),  # I
+        Range(0.1, 0.2),  # M
+        Range(0, 0.1),  # _
+    ]
     cr = Range(int('0' * OPERATORS_SIZE), int('9' * OPERATORS_SIZE))
     return ranges, cr, cr.delta()
 
 
 def recalculate_cr(cr: Range, r: Range):
     delta = cr.delta()
-    cr.y = int(cr.x + delta * r.y)
+    cr.y = int(cr.x + delta * r.y)-1
     cr.x = int(cr.x + delta * r.x)
     return cr
 
@@ -55,8 +65,8 @@ def encode(raw_data: bytes):
             answer = answer * 10 + int(crs.x[0])
             cr = shift_cr(cr, crs)
 
-    range = ranges[EOF]
-    cr = recalculate_cr(cr, range)
+    # range = ranges[EOF]
+    # cr = recalculate_cr(cr, range)
     crs = cr.str()
     answer = answer * 10 ** len(crs.x) + int(crs.x)
     return answer
@@ -89,12 +99,16 @@ def decode(encoded_data: int):
             data_pointer += 1
             code = data_str[data_pointer:data_pointer + OPERATORS_SIZE]
 
-
     return answer
 
 
 if __name__ == '__main__':
-    raw = b'abc'
-    encoded = encode(raw)
-    restored = decode(encoded)
-    print(raw == restored)
+    # raw = b'abc'
+    # encoded = encode(raw)
+    # restored = decode(encoded)
+    # print(raw == restored)
+    swiss_miss = b'\x00\x01\x02\x00\x00\x04\x03\x02\x00\x00'  # SWISS_MISS 0120043200
+    encoded = encode(swiss_miss)
+    print(encoded)
+    decoded = decode(encoded)
+    print(decoded)
