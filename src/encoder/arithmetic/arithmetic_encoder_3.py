@@ -43,7 +43,7 @@ def initialize():
 
 def recalculate_cr(cr: Range, r: Range):
     delta = cr.delta()
-    cr.y = int(cr.x + delta * r.y)-1
+    cr.y = int(cr.x + delta * r.y) - 1
     cr.x = int(cr.x + delta * r.x)
     return cr
 
@@ -87,10 +87,10 @@ def decode(encoded_data: int):
     answer = bytearray()
     # prob = float('0.' + code)
     while True:
-        prob = (int(code) - cr.x) / delta
+        prob = (int(code) - cr.x) / cr.delta()
         char, range = lookup_char(prob, ranges)
-        if EOF == char:
-            break
+        # if EOF == char:
+        #     break
         answer.append(char)
         cr = recalculate_cr(cr, range)
         crs = cr.str()
@@ -98,8 +98,10 @@ def decode(encoded_data: int):
             cr = shift_cr(cr, crs)
             data_pointer += 1
             code = data_str[data_pointer:data_pointer + OPERATORS_SIZE]
+            if data_pointer + OPERATORS_SIZE >= len(data_str) :
+                break
 
-    return answer
+    return bytes(answer)
 
 
 if __name__ == '__main__':
@@ -111,4 +113,6 @@ if __name__ == '__main__':
     encoded = encode(swiss_miss)
     print(encoded)
     decoded = decode(encoded)
+    print(swiss_miss)
     print(decoded)
+    print(swiss_miss == decoded)
