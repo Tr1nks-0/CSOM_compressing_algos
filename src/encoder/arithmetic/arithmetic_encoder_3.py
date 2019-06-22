@@ -1,9 +1,14 @@
 # ALPHABET_SIZE = 258  # use 258 because it more dividable
+import logging
+
 ALPHABET_SIZE = 6  # use 258 because it more dividable
 # EOF = 256
 EOF = 5
 # OPERATORS_SIZE = 8
 OPERATORS_SIZE = 4
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 
 
 class Range:
@@ -31,11 +36,12 @@ def create_initial_ranges() -> list:
 def initialize():
     # ranges = create_initial_ranges()
     ranges = [
-        Range(0.5, 1),  # S
-        Range(0.4, 0.5),  # W
-        Range(0.2, 0.4),  # I
-        Range(0.1, 0.2),  # M
-        Range(0, 0.1),  # _
+        Range(0.6, 1),  # S
+        Range(0.5, 0.6),  # W
+        Range(0.3, 0.5),  # I
+        Range(0.2, 0.3),  # M
+        Range(0.01, 0.2),  # _
+        Range(0, 0.01)
     ]
     cr = Range(int('0' * OPERATORS_SIZE), int('9' * OPERATORS_SIZE))
     return ranges, cr, cr.delta()
@@ -65,8 +71,8 @@ def encode(raw_data: bytes):
             answer = answer * 10 + int(crs.x[0])
             cr = shift_cr(cr, crs)
 
-    # range = ranges[EOF]
-    # cr = recalculate_cr(cr, range)
+    range = ranges[EOF]
+    cr = recalculate_cr(cr, range)
     crs = cr.str()
     answer = answer * 10 ** len(crs.x) + int(crs.x)
     return answer
@@ -89,17 +95,17 @@ def decode(encoded_data: int):
     while True:
         prob = (int(code) - cr.x) / cr.delta()
         char, range = lookup_char(prob, ranges)
-        # if EOF == char:
-        #     break
+        if EOF == char:
+            break
         answer.append(char)
         cr = recalculate_cr(cr, range)
         crs = cr.str()
         if crs.x[0] == crs.y[0]:
+            # if data_pointer + OPERATORS_SIZE >= len(data_str):
+            #     break
             cr = shift_cr(cr, crs)
             data_pointer += 1
             code = data_str[data_pointer:data_pointer + OPERATORS_SIZE]
-            if data_pointer + OPERATORS_SIZE >= len(data_str) :
-                break
 
     return bytes(answer)
 
