@@ -1,6 +1,8 @@
 from typing import BinaryIO
 
 
+# NAME: Sergey Baydin, 8.04.122.010.18.2
+# ASGN: N2
 class BitInputStream:
     def __init__(self, source: BinaryIO):
         self.source = source

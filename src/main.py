@@ -1,8 +1,8 @@
 import sys
 
 # NAME: Sergey Baydin, 8.04.122.010.18.2
-# ASGN: N1
-from encoder.arithmetic.arithmetic_encoder import ArithmeticEncoder
+# ASGN: N1 N2
+from encoder.arithmetic.adaptive_encoder import AdaptiveArithmeticEncoder
 from encoder.encoder import Encoder
 from encoder.hufman.hufman_encoder import HufmanEncoder
 
@@ -11,7 +11,7 @@ def encoder_factory(algo_name: str) -> Encoder:
     if algo_name in ('h', 'hufman'):
         return HufmanEncoder()
     elif algo_name in ('a', 'arithmetic'):
-        return ArithmeticEncoder()
+        return AdaptiveArithmeticEncoder()
     else:
         raise NotImplementedError(f'No algorithm with key {algo_name} found.')
 
