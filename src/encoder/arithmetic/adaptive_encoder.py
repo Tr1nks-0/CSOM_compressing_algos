@@ -1,3 +1,5 @@
+# NAME: Sergey Baydin, 8.04.122.010.18.2
+# ASGN: N2
 import contextlib
 from io import BytesIO
 from typing import BinaryIO, Tuple, IO
@@ -9,8 +11,7 @@ from util.stream.in_stream import BitInputStream
 from util.stream.out_stream import BitOutputStream
 
 
-# NAME: Sergey Baydin, 8.04.122.010.18.2
-# ASGN: N2
+
 class AdaptiveArithmeticEncoder(Encoder):
     def __init__(self):
         super().__init__()

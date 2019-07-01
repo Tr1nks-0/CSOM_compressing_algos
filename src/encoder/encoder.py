@@ -1,3 +1,5 @@
+# NAME: Sergey Baydin, 8.04.122.010.18.2
+# ASGN: N1 N2
 import os
 from typing import BinaryIO, Tuple
 
