@@ -7,6 +7,7 @@ from encoder.encoder import Encoder
 from encoder.hufman.hufman_encoder import HufmanEncoder
 
 
+# фабрика алгоритмов
 def encoder_factory(algo_name: str) -> Encoder:
     if algo_name in ('h', 'hufman'):
         return HufmanEncoder()
@@ -16,6 +17,7 @@ def encoder_factory(algo_name: str) -> Encoder:
         raise NotImplementedError(f'No algorithm with key {algo_name} found.')
 
 
+# обработать файл с помошью алгоритма
 def operate(encoder: Encoder, in_file_str, mode):
     filenames = in_file_str.split(',')
     for filename in filenames:
@@ -26,10 +28,11 @@ def operate(encoder: Encoder, in_file_str, mode):
             encoder.restore_file(filename)
 
 
+# Точка начала исполнение скрипта
 if __name__ == '__main__':
     loop = True
     while (loop):
-        if len(sys.argv) == 1:
+        if len(sys.argv) == 1:  # запуск в интеактивном режиме
             algo = input('Enter algorythm ( [H]ufman, [A]rithmetic ). For exit type [E]\n> ').lower()
             if algo == 'e' or algo == 'q':
                 exit(0)
@@ -37,14 +40,15 @@ if __name__ == '__main__':
             if mode == 'e' or mode == 'q':
                 exit(0)
             in_file_str = input('Enter filename\n> ')
-        else:
+        else:  # запуск в коммандном режиме
             if 1 < len(sys.argv) < 4:
                 print(f'To Few arguments for operate. Expected 3 : '
                       f'[algorithm] [operation] [input_file], got: {len(sys.argv)}\n')
                 exit(1)
             loop = False
-            mode = sys.argv[1]
-            in_file_str = sys.argv[2]
+            algo = sys.argv[1]
+            mode = sys.argv[2]
+            in_file_str = sys.argv[3]
         try:
             operate(encoder_factory(algo), in_file_str, mode)
         except FileNotFoundError:

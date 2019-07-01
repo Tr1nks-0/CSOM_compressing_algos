@@ -9,6 +9,7 @@ class BitOutputStream:
         self.buffer_byte = 0
         self.buffer_length = 0
 
+    # Битовый выходной поток, лбъеденяет биты в группы по 1 байт и записывает в выходной поток
     def write(self, bit: int):
         if bit not in (0, 1):
             raise ValueError(f'Bit should be 0 or 1, Not {bit}')
@@ -25,6 +26,7 @@ class BitOutputStream:
         self.flush()
         self.destination.close()
 
+    # Дополняет текущий байт до длинны в 8 бит для записи, т.к. файловые системы не поддерживают запись неполного байта
     def flush(self):
         while self.buffer_length != 0:
             self.write(0)

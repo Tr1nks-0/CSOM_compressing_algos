@@ -11,6 +11,7 @@ class BitInputStream:
         self.byte_int = 0
         self.has_next = True
 
+    # Битовый поток. Читает побайтово данные из источника и побитово возвращает.
     def read(self) -> int:
         if self.source.closed:
             raise IOError('Attempt to read from closed source stream')
@@ -26,6 +27,7 @@ class BitInputStream:
         self.index -= 1
         return self.byte_int >> self.index & 1
 
+    # Позволяет использовать в менеджерах контекста
     def bits(self):
         while self.has_next and not self.source.closed:
             bit = self.read()

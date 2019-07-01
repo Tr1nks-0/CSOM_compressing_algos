@@ -1,6 +1,8 @@
+# NAME: Sergey Baydin, 8.04.122.010.18.2
+# ASGN: N1
+
+# нода дерева Хаффмана
 class Node:
-    # NAME: Sergey Baydin, 8.04.122.010.18.2
-    # ASGN: N1
 
     def __init__(self, character: int = None, frequency: int = 0,
                  left_child: 'Node' = None, right_child: 'Node' = None) -> 'Node':
@@ -13,9 +15,7 @@ class Node:
             self.left_child = None
             self.right_child = None
         else:
-            # if left_child is not None:
             self.left_child: 'Node' = left_child
-            # if right_child is not None:
             self.right_child: 'Node' = right_child
 
     @classmethod
