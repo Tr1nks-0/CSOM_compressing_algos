@@ -10,7 +10,7 @@ class BitOutputStream:
         self.buffer_length = 0
 
     def write(self, bit: int):
-        if 1 < bit < 0:
+        if bit not in (0, 1):
             raise ValueError(f'Bit should be 0 or 1, Not {bit}')
         self.buffer_byte = self.buffer_byte << 1 | bit
         self.buffer_length += 1
@@ -22,7 +22,12 @@ class BitOutputStream:
             raise RuntimeError('Something went wrong with output stream - complete byte was not wrote.')
 
     def close(self):
+        self.flush()
         self.destination.close()
+
+    def flush(self):
+        while self.buffer_length != 0:
+            self.write(0)
 
     def __enter__(self):
         return self

@@ -56,3 +56,6 @@ class FrequencyTable:
     def _check_symbol(self, char):
         if 0 > char >= self.length:
             raise ValueError(f'Symbol {char} out of range')
+
+    def __str__(self):
+        return str(self.frequencies)
