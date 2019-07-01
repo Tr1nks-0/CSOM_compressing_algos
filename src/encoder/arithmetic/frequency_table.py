@@ -1,7 +1,6 @@
-
-
 # NAME: Sergey Baydin, 8.04.122.010.18.2
 # ASGN: N2
+# Таблица частот
 class FrequencyTable:
 
     def __init__(self, length):
@@ -13,10 +12,12 @@ class FrequencyTable:
         self.amount = sum(self.frequencies)
         self.accumulated_frequency = self._recalculate_accumulated()
 
+    # получить частоту
     def get(self, symbol):
         self._check_symbol(symbol)
         return self.frequencies[symbol]
 
+    # задачть новую частоту
     def set(self, symbol, frequency):
         self._check_symbol(symbol)
         if frequency < 0:
@@ -27,20 +28,24 @@ class FrequencyTable:
         self.frequencies[symbol] = frequency
         self.accumulated_frequency = self._recalculate_accumulated()
 
+    # увеличить частоту
     def increment_char_frequency(self, symbol):
         self._check_symbol(symbol)
         self.amount += 1
         self.frequencies[symbol] += 1
         self.accumulated_frequency = self._recalculate_accumulated()
 
+    # накопленная левая граница
     def accumulated_x(self, symbol):
         self._check_symbol(symbol)
         return self.accumulated_frequency[symbol]
 
+    # накопленная правая граница
     def accumulated_y(self, symbol):
         self._check_symbol(symbol)
         return self.accumulated_frequency[symbol + 1]
 
+    # пересчитать накопленные границы
     def _recalculate_accumulated(self) -> list:
         accumulated = [0]
         sum = 0

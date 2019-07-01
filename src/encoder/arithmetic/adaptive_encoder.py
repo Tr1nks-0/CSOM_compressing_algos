@@ -11,7 +11,7 @@ from util.stream.in_stream import BitInputStream
 from util.stream.out_stream import BitOutputStream
 
 
-
+# Адаптивный арифметический алгоритм сжатия
 class AdaptiveArithmeticEncoder(Encoder):
     def __init__(self):
         super().__init__()
@@ -34,25 +34,27 @@ class AdaptiveArithmeticEncoder(Encoder):
         self.decompress(bin_in, restored)
         return restored.getvalue()
 
+    # сжимает данные из потока в поток
     def compress(self, input: IO, bit_output: BitOutputStream):
-        freqs = FrequencyTable(257)
-        enc = ArithmeticEncoder(bit_output)
+        freqs = FrequencyTable(257)  # начальная таблица на 257 байт, 257 байт - исскуственный, обозначает конец файла
+        enc = ArithmeticEncoder(bit_output)  # реализация сжатия
         while True:
-            symbol = input.read(1)
-            if len(symbol) == 0:
+            symbol = input.read(1)  # берет байт данных
+            if len(symbol) == 0:  # до конца всех байт
                 break
             symbol = symbol[0]
-            enc.write(freqs, symbol)
-            freqs.increment_char_frequency(symbol)
-        enc.write(freqs, 256)
-        enc.finalize()
+            enc.write(freqs, symbol)  # записываем в сжимаемую последовательности
+            freqs.increment_char_frequency(symbol)  # увеличиваем частоту символа
+        enc.write(freqs, 256)  # записываем конец файла
+        enc.finalize()  # дополняем до длинны байта нулями справа
 
+    # восстанавливает данные из потока в поток
     def decompress(self, bit_input: BitInputStream, output: IO):
-        freqs = FrequencyTable(257)
-        dec = ArithmeticDecoder(bit_input)
+        freqs = FrequencyTable(257)  # начальная таблица на 257 байт, 257 байт - исскуственный, обозначает конец файла
+        dec = ArithmeticDecoder(bit_input)  # реализация восстановления
         while True:
-            symbol = dec.read(freqs)
-            if symbol == 256:
+            symbol = dec.read(freqs)  # восстанавливаем символ
+            if symbol == 256:  # если конец файла то выходим
                 break
-            output.write(bytes((symbol,)))
-            freqs.increment_char_frequency(symbol)
+            output.write(bytes((symbol,)))  # записываем симаол в выходной поток
+            freqs.increment_char_frequency(symbol)  # увеличиваем частоту чимвола
