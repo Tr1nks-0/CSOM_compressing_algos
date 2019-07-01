@@ -50,5 +50,5 @@ class Encoder:
 
     def calculate_meta(self, initial_length, compressed_length) -> Tuple[int, float, str]:
         size_different = initial_length - compressed_length
-        rate = 100 - compressed_length / initial_length * 100
+        rate = 100 - compressed_length / (1 if initial_length == 0 else initial_length) * 100
         return size_different, rate, self.name
